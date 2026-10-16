@@ -1,15 +1,23 @@
+using Products.API.Repositories;
+using Products.API.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Controllers. Apagamos la validación automática de .NET para que use la nuestra (PRD-002)
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Nuestras clases
+// Singleton = una sola lista para toda la app (si no, se borraría en cada pedido)
+builder.Services.AddSingleton<ProductRepository>();
+builder.Services.AddScoped<ProductService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

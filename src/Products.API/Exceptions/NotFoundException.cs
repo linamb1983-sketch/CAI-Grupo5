@@ -3,7 +3,7 @@
 // Cuando algo no existe (ej: un Id que no está)
 public class NotFoundException : Exception
 {
-    public string ErrorCode { get; set; }
+    public string ErrorCode { get; }
 
     public NotFoundException(string errorCode, string message) : base(message)
     {
