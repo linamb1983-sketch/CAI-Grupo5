@@ -1,6 +1,39 @@
 @Orders.API_HostAddress = http://localhost:5124
+@userId = a1b2c3d4-0000-0000-0000-111122223333
+@orderId = f1e2d3c4-0000-0000-0000-aabbccddeeff
 
-GET {{Orders.API_HostAddress}}/weatherforecast/
+### Listar todas las órdenes
+GET {{Orders.API_HostAddress}}/api/orders
 Accept: application/json
+
+### Filtrar órdenes por usuario
+GET {{Orders.API_HostAddress}}/api/orders?usuarioId={{userId}}
+Accept: application/json
+
+### Obtener una orden
+GET {{Orders.API_HostAddress}}/api/orders/{{orderId}}
+Accept: application/json
+
+### Crear una orden (requiere que Users y Products API estén disponibles)
+POST {{Orders.API_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "usuarioId": "{{userId}}",
+  "items": [
+    {
+      "productoId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "cantidad": 2
+    }
+  ]
+}
+
+### Actualizar el estado de una orden
+PUT {{Orders.API_HostAddress}}/api/orders/{{orderId}}/status
+Content-Type: application/json
+
+{
+  "estado": "Confirmada"
+}
 
 ###
