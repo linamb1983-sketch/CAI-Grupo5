@@ -16,7 +16,7 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
 
         int status = 409;
         string title = "Conflict";
-        string type = "https://tools.ietf.org/html/rfc7231#section-6.5.8";
+        string type = "https://tools.ietf.org/html/rfc7231#section-6.5.9";
         string detail = "La operación no puede completarse por una regla del negocio.";
 
         if (ex.ErrorCode == ErrorCodes.ORD_005)
@@ -25,6 +25,10 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
             title = "Unprocessable Entity";
             type = "https://tools.ietf.org/html/rfc4918#section-11.2";
             detail = "No se puede procesar la solicitud.";
+        }
+        else if (ex.ErrorCode == ErrorCodes.ORD_006)
+        {
+            detail = "No se puede modificar el estado.";
         }
 
         context.Response.StatusCode = status;
