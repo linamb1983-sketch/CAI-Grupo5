@@ -10,7 +10,12 @@ builder.Services.AddControllers()
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opciones =>
+{
+    // Lee los comentarios /// del código (controller, DTOs, modelo) y los muestra en Swagger
+    string archivoXml = Path.Combine(AppContext.BaseDirectory, "Products.API.xml");
+    opciones.IncludeXmlComments(archivoXml);
+});
 
 // Manejo de errores (Apéndice B de la consigna).
 // Van en orden: primero los específicos, último el genérico.
