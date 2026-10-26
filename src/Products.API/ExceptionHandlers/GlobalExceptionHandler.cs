@@ -7,8 +7,18 @@ namespace Products.API.ExceptionHandlers;
 // Devuelve un 500 con PRD-005 y NO muestra el detalle técnico del error.
 public class GlobalExceptionHandler : IExceptionHandler
 {
+    private ILogger<GlobalExceptionHandler> logger;
+
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    {
+        this.logger = logger;
+    }
+
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
+        // Es un error inesperado: se loguea como Error, con el detalle técnico (solo en el log, nunca en la respuesta)
+        logger.LogError(exception, "Error inesperado {ErrorCode}", ErrorCodes.PRD_005);
+
         context.Response.StatusCode = 500;
 
         await context.Response.WriteAsJsonAsync(new
@@ -19,7 +29,8 @@ public class GlobalExceptionHandler : IExceptionHandler
             detail = "Ocurrió un error inesperado.",
             instance = context.Request.Path.Value,
             errorCode = ErrorCodes.PRD_005,
-            errorMessage = "Error interno al procesar el producto."
+            errorMessage = "Error interno al procesar el producto.",
+            correlationId = $"{context.Items["CorrelationId"]}"
         }, cancellationToken);
 
         return true;
