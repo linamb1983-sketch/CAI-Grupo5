@@ -33,6 +33,10 @@ public class ErrorProductoNoEncontrado
     /// <summary>Mensaje del catálogo de errores.</summary>
     /// <example>Producto no encontrado.</example>
     public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>Id para seguir el pedido en los logs (mismo valor que el header X-Correlation-Id).</summary>
+    /// <example>8b1f2c3d-4e5a-4b6c-9d7e-0f1a2b3c4d5e</example>
+    public string CorrelationId { get; set; } = string.Empty;
 }
 
 /// <summary>PRD-002 (400): los datos del producto son inválidos.</summary>
@@ -65,6 +69,10 @@ public class ErrorDatosInvalidos
     /// <summary>Mensaje del catálogo de errores.</summary>
     /// <example>El nombre es obligatorio; El precio debe ser mayor a cero</example>
     public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>Id para seguir el pedido en los logs (mismo valor que el header X-Correlation-Id).</summary>
+    /// <example>8b1f2c3d-4e5a-4b6c-9d7e-0f1a2b3c4d5e</example>
+    public string CorrelationId { get; set; } = string.Empty;
 }
 
 /// <summary>PRD-003 (409): ya existe un producto con ese nombre en la categoría.</summary>
@@ -97,6 +105,10 @@ public class ErrorProductoDuplicado
     /// <summary>Mensaje del catálogo de errores.</summary>
     /// <example>Ya existe un producto con ese nombre en la categoría 'Electrónica'.</example>
     public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>Id para seguir el pedido en los logs (mismo valor que el header X-Correlation-Id).</summary>
+    /// <example>8b1f2c3d-4e5a-4b6c-9d7e-0f1a2b3c4d5e</example>
+    public string CorrelationId { get; set; } = string.Empty;
 }
 
 /// <summary>PRD-004 (409): el producto tiene órdenes activas y no puede eliminarse.</summary>
@@ -129,6 +141,10 @@ public class ErrorProductoConOrdenes
     /// <summary>Mensaje del catálogo de errores.</summary>
     /// <example>El producto tiene órdenes activas y no puede eliminarse.</example>
     public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>Id para seguir el pedido en los logs (mismo valor que el header X-Correlation-Id).</summary>
+    /// <example>8b1f2c3d-4e5a-4b6c-9d7e-0f1a2b3c4d5e</example>
+    public string CorrelationId { get; set; } = string.Empty;
 }
 
 /// <summary>PRD-005 (500): error inesperado. Nunca muestra detalles técnicos.</summary>
@@ -161,4 +177,8 @@ public class ErrorInterno
     /// <summary>Mensaje del catálogo de errores.</summary>
     /// <example>Error interno al procesar el producto.</example>
     public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>Id para seguir el pedido en los logs (mismo valor que el header X-Correlation-Id).</summary>
+    /// <example>8b1f2c3d-4e5a-4b6c-9d7e-0f1a2b3c4d5e</example>
+    public string CorrelationId { get; set; } = string.Empty;
 }
