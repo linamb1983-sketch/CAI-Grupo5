@@ -182,3 +182,42 @@ public class CartService
 
         // Cualquier otro error de Products es inesperado: lo ataja el GlobalExceptionHandler (500, CRT-005)
         if (respuesta.IsSuccessStatusCode == false)
+        {
+            throw new Exception($"Products API respondió con error {(int)respuesta.StatusCode}.");
+        }
+
+        ProductInfo producto = await respuesta.Content.ReadFromJsonAsync<ProductInfo>();
+        return producto;
+    }
+
+    // Busca un producto dentro del carrito. Si no está, devuelve null.
+    private CartItem BuscarItem(ShoppingCart carrito, Guid productoId)
+    {
+        foreach (CartItem item in carrito.Items)
+        {
+            if (item.ProductoId == productoId)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    // Pasa el carrito de adentro (Model) al formulario de salida (DTO)
+    private CartResponse ConvertirAResponse(ShoppingCart carrito)
+    {
+        CartResponse respuesta = new CartResponse();
+        respuesta.UsuarioId = carrito.UsuarioId;
+        respuesta.FechaActualizacion = carrito.FechaActualizacion;
+
+        foreach (CartItem item in carrito.Items)
+        {
+            CartItemResponse itemResponse = new CartItemResponse();
+            itemResponse.ProductoId = item.ProductoId;
+            itemResponse.Cantidad = item.Cantidad;
+            respuesta.Items.Add(itemResponse);
+        }
+
+        return respuesta;
+    }
+}
