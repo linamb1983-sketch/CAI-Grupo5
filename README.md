@@ -6,7 +6,7 @@ Es un e-commerce armado con 5 microservicios. Cada uno es una API REST independi
 ## Integrantes
 
 - Federico Glorioso
-- Carolina Masciotra
+- Carolina Sol Masciotra Brea
 - Bianca Robles
 
 ## Microservicios y puertos
