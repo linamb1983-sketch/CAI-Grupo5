@@ -29,7 +29,7 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options => options.RoutePrefix = "swagger/orders");
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

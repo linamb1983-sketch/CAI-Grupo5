@@ -125,7 +125,7 @@ public class OrderService
     }
 
     // Cambia el estado solo si la transición está permitida.
-    public OrderResponse ModificarEstado(Guid id, string estadoNuevo)
+    public UpdateOrderStatusResponse ModificarEstado(Guid id, string estadoNuevo)
     {
         Order? orden = repositorio.ObtenerPorId(id);
 
@@ -140,8 +140,14 @@ public class OrderService
         }
 
         orden.Estado = estadoNuevo;
+        orden.FechaActualizacion = DateTime.UtcNow;
 
-        return ConvertirAResponse(orden);
+        return new UpdateOrderStatusResponse
+        {
+            Id = orden.Id,
+            Estado = orden.Estado,
+            FechaActualizacion = orden.FechaActualizacion
+        };
     }
 
     // Consulta Users API y traduce un 404 al código de Orders.

@@ -9,4 +9,5 @@ public class Order
     public decimal Total { get; set; }
     public string Estado { get; set; } = string.Empty;
     public DateTime FechaCreacion { get; set; }
+    public DateTime FechaActualizacion { get; set; }
 }

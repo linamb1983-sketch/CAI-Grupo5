@@ -48,7 +48,7 @@ public class OrdersController : ControllerBase
 
     // PUT /api/orders/{id}/status
     [HttpPut("{id}/status")]
-    public IActionResult ModificarEstado(Guid id, UpdateOrderStatusRequest request)
+    public ActionResult<UpdateOrderStatusResponse> ModificarEstado(Guid id, UpdateOrderStatusRequest request)
     {
         ValidarDatos();
 
@@ -57,8 +57,8 @@ public class OrdersController : ControllerBase
             throw new ValidationException(ErrorCodes.ORD_002, "Los datos de la orden son inválidos.");
         }
 
-        OrderResponse orden = servicio.ModificarEstado(id, request.Estado);
-        return Ok(orden);
+        UpdateOrderStatusResponse respuesta = servicio.ModificarEstado(id, request.Estado);
+        return Ok(respuesta);
     }
 
     // Junta los errores del modelo y devuelve el código de validación de Orders.
