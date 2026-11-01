@@ -6,12 +6,21 @@ namespace Products.API.Repositories;
 // Cuando llegue la librería de la cátedra, cambiamos solo esta clase.
 public class ProductRepository
 {
+    // La lista es privada: solo se modifica con los métodos de esta clase
     private List<Product> productos = new List<Product>();
 
-    // Devuelve todos los productos
+    // Devuelve todos los productos.
+    // Devuelve una copia de la lista, así nadie de afuera puede agregar o sacar productos sin pasar por acá.
     public List<Product> ObtenerTodos()
     {
-        return productos;
+        List<Product> copia = new List<Product>();
+
+        foreach (Product p in productos)
+        {
+            copia.Add(p);
+        }
+
+        return copia;
     }
 
     // Busca un producto por su Id.
