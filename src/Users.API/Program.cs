@@ -1,17 +1,24 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Controllers. Apagamos la validación automática de .NET para que use la nuestra (USR-002)
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(opciones =>
+{
+    // Lee los comentarios /// del código (controller, DTOs, modelo) y los muestra en Swagger
+    string archivoXml = Path.Combine(AppContext.BaseDirectory, "Users.API.xml");
+    opciones.IncludeXmlComments(archivoXml);
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
