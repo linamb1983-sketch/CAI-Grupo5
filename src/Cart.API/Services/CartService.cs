@@ -164,6 +164,21 @@ public class CartService
         carrito.FechaActualizacion = DateTime.UtcNow;
     }
 
+    // DELETE: vacía todos los productos del carrito del usuario.
+    public void VaciarCarrito(Guid usuarioId)
+    {
+        // CRT-001: el usuario tiene que tener un carrito existente
+        ShoppingCart carrito = repositorio.ObtenerPorUsuario(usuarioId);
+
+        if (carrito == null)
+        {
+            throw new NotFoundException(ErrorCodes.CRT_001, "Carrito no encontrado.");
+        }
+
+        carrito.Items.Clear();
+        carrito.FechaActualizacion = DateTime.UtcNow;
+    }
+
     // Le pregunta a Products API por un producto. Si no existe, CRT-002.
     private async Task<ProductInfo> ConsultarProducto(Guid productoId)
     {

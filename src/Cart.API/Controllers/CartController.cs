@@ -92,6 +92,22 @@ public class CartController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Vacía el carrito completo del usuario y conserva el carrito existente.
+    /// </summary>
+    /// <param name="userId">Id del usuario.</param>
+    /// <response code="204">Carrito vaciado (sin contenido).</response>
+    /// <response code="404">CRT-001: Carrito no encontrado.</response>
+    /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
+    [HttpDelete("{userId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult VaciarCarrito(Guid userId)
+    {
+        servicio.VaciarCarrito(userId);
+        return NoContent();
+    }
+
     // Si los datos no cumplen las reglas del DTO, junta todos los errores
     // separados por punto y coma y corta con CRT-004.
     private void ValidarDatos()

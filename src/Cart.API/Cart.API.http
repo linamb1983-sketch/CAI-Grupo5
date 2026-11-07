@@ -1,6 +1,8 @@
-@Cart.API_HostAddress = http://localhost:5037
+@Cart.API_HostAddress = http://localhost:5004
+@userId = a1b2c3d4-0000-0000-0000-111122223333
 
-GET {{Cart.API_HostAddress}}/weatherforecast/
+### Vaciar el carrito del usuario
+DELETE {{Cart.API_HostAddress}}/api/cart/{{userId}}
 Accept: application/json
 
 ###
