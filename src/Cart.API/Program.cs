@@ -49,6 +49,9 @@ builder.Services.AddProblemDetails();
 // Para que Cart pueda llamar a Products por HTTP (IHttpClientFactory)
 builder.Services.AddHttpClient();
 
+// Para que el Service pueda leer el Correlation ID del pedido actual y mandárselo a Products
+builder.Services.AddHttpContextAccessor();
+
 // Nuestras clases
 // Singleton = una sola lista para toda la app (si no, se borraría en cada pedido)
 builder.Services.AddSingleton<CartRepository>();
