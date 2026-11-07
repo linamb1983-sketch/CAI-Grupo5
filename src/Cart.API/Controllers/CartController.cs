@@ -101,6 +101,7 @@ public class CartController : ControllerBase
     /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
     [HttpDelete("{userId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult VaciarCarrito(Guid userId)
     {
         servicio.VaciarCarrito(userId);
