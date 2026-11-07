@@ -6,6 +6,13 @@ namespace Orders.API.ExceptionHandlers;
 // Devuelve 422 para stock insuficiente y 409 para otras reglas de negocio.
 public class BusinessRuleExceptionHandler : IExceptionHandler
 {
+    private ILogger<BusinessRuleExceptionHandler> logger;
+
+    public BusinessRuleExceptionHandler(ILogger<BusinessRuleExceptionHandler> logger)
+    {
+        this.logger = logger;
+    }
+
     // Maneja las reglas de negocio con el estado correspondiente al código.
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
@@ -22,7 +29,7 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
         if (ex.ErrorCode == ErrorCodes.ORD_005)
         {
             status = 422;
-            title = "Unprocessable Entity";
+            title = "UnprocessableEntity";
             type = "https://tools.ietf.org/html/rfc4918#section-11.2";
             detail = "No se puede procesar la solicitud.";
         }
@@ -30,6 +37,11 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
         {
             detail = "No se puede modificar el estado.";
         }
+
+        logger.LogWarning(
+            "Regla de negocio de Orders: {ErrorCode} - {ErrorMessage}",
+            ex.ErrorCode,
+            ex.Message);
 
         context.Response.StatusCode = status;
 
@@ -41,7 +53,8 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
             detail,
             instance = context.Request.Path.Value,
             errorCode = ex.ErrorCode,
-            errorMessage = ex.Message
+            errorMessage = ex.Message,
+            correlationId = $"{context.Items["CorrelationId"]}"
         }, cancellationToken);
 
         return true;

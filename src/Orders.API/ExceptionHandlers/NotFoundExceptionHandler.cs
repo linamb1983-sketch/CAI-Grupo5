@@ -6,6 +6,13 @@ namespace Orders.API.ExceptionHandlers;
 // Devuelve el formato estándar para errores 404.
 public class NotFoundExceptionHandler : IExceptionHandler
 {
+    private ILogger<NotFoundExceptionHandler> logger;
+
+    public NotFoundExceptionHandler(ILogger<NotFoundExceptionHandler> logger)
+    {
+        this.logger = logger;
+    }
+
     // Maneja únicamente las excepciones de recurso no encontrado.
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
@@ -13,6 +20,11 @@ public class NotFoundExceptionHandler : IExceptionHandler
         {
             return false;
         }
+
+        logger.LogWarning(
+            "Recurso de Orders no encontrado: {ErrorCode} - {ErrorMessage}",
+            ex.ErrorCode,
+            ex.Message);
 
         context.Response.StatusCode = 404;
 
@@ -24,7 +36,8 @@ public class NotFoundExceptionHandler : IExceptionHandler
             detail = "El recurso solicitado no fue encontrado.",
             instance = context.Request.Path.Value,
             errorCode = ex.ErrorCode,
-            errorMessage = ex.Message
+            errorMessage = ex.Message,
+            correlationId = $"{context.Items["CorrelationId"]}"
         }, cancellationToken);
 
         return true;

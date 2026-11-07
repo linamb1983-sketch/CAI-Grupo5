@@ -13,13 +13,15 @@ public class OrderService
     private OrderRepository repositorio;
     private IHttpClientFactory httpClientFactory;
     private IConfiguration configuracion;
+    private IHttpContextAccessor httpContextAccessor;
 
     // Recibe el repositorio, la fábrica HTTP y la configuración de servicios.
-    public OrderService(OrderRepository repositorio, IHttpClientFactory httpClientFactory, IConfiguration configuracion)
+    public OrderService(OrderRepository repositorio, IHttpClientFactory httpClientFactory, IConfiguration configuracion, IHttpContextAccessor httpContextAccessor)
     {
         this.repositorio = repositorio;
         this.httpClientFactory = httpClientFactory;
         this.configuracion = configuracion;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     // Devuelve todas las órdenes o las de un usuario.
@@ -136,7 +138,9 @@ public class OrderService
 
         if (!PuedeCambiarEstado(orden.Estado, estadoNuevo))
         {
-            throw new BusinessRuleException(ErrorCodes.ORD_006, "El estado de la orden no puede ser modificado.");
+            throw new BusinessRuleException(
+                ErrorCodes.ORD_006,
+                $"Una orden en estado '{orden.Estado}' no puede volver a '{estadoNuevo}'.");
         }
 
         orden.Estado = estadoNuevo;
@@ -155,7 +159,7 @@ public class OrderService
     {
         string direccion = ObtenerDireccionBase("Services:Users:BaseUrl");
         string url = $"{direccion}/api/users/{usuarioId}";
-        HttpClient cliente = httpClientFactory.CreateClient();
+        HttpClient cliente = CrearClienteConCorrelationId();
 
         using HttpResponseMessage respuesta = await cliente.GetAsync(url, cancellationToken);
 
@@ -175,7 +179,7 @@ public class OrderService
     {
         string direccion = ObtenerDireccionBase("Services:Products:BaseUrl");
         string url = $"{direccion}/api/products/{productoId}";
-        HttpClient cliente = httpClientFactory.CreateClient();
+        HttpClient cliente = CrearClienteConCorrelationId();
 
         using HttpResponseMessage respuesta = await cliente.GetAsync(url, cancellationToken);
 
@@ -224,6 +228,23 @@ public class OrderService
         }
 
         return uri.ToString().TrimEnd('/');
+    }
+
+    // Reenvía a Users y Products el identificador de la solicitud original.
+    private HttpClient CrearClienteConCorrelationId()
+    {
+        HttpClient cliente = httpClientFactory.CreateClient();
+        HttpContext? context = httpContextAccessor.HttpContext;
+
+        if (context != null && context.Items.TryGetValue("CorrelationId", out object? valor))
+        {
+            if (valor != null)
+            {
+                cliente.DefaultRequestHeaders.TryAddWithoutValidation("X-Correlation-Id", valor.ToString());
+            }
+        }
+
+        return cliente;
     }
 
     // Define los cambios de estado permitidos para una orden.
