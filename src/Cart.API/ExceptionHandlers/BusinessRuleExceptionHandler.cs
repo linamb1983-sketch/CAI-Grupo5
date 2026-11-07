@@ -7,6 +7,13 @@ namespace Cart.API.ExceptionHandlers;
 // Para CRT-003 (stock insuficiente) devuelve 422, como pide la consigna. Para cualquier otra, 409.
 public class BusinessRuleExceptionHandler : IExceptionHandler
 {
+    private ILogger<BusinessRuleExceptionHandler> logger;
+
+    public BusinessRuleExceptionHandler(ILogger<BusinessRuleExceptionHandler> logger)
+    {
+        this.logger = logger;
+    }
+
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
         // Si no es un BusinessRuleException, no es para mí: que lo intente el siguiente handler
@@ -14,6 +21,9 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
         {
             return false;
         }
+
+        // Es un error de negocio esperado: se loguea como Warning, con su errorCode
+        logger.LogWarning("Regla de negocio {ErrorCode}: {ErrorMessage}", ex.ErrorCode, ex.Message);
 
         // Valores por defecto: 409 Conflict
         int status = 409;
@@ -40,7 +50,8 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
             detail = detail,
             instance = context.Request.Path.Value,
             errorCode = ex.ErrorCode,
-            errorMessage = ex.Message
+            errorMessage = ex.Message,
+            correlationId = $"{context.Items["CorrelationId"]}"
         }, cancellationToken);
 
         return true;
