@@ -59,4 +59,11 @@ public class UserRepository
     {
         usuarios.Add(usuario);
     }
+
+    // Devuelve cuántos usuarios hay guardados.
+    // La usa el Health Check para saber si el repositorio responde.
+    public int Cantidad()
+    {
+        return usuarios.Count;
+    }
 }
