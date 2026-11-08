@@ -29,6 +29,8 @@ public class CartController : ControllerBase
     /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
     [HttpGet("{userId}")]
     [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorCarritoNoEncontrado), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public IActionResult ObtenerCarrito(Guid userId)
     {
         CartResponse carrito = servicio.ObtenerCarrito(userId);
@@ -47,6 +49,10 @@ public class CartController : ControllerBase
     /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
     [HttpPost("{userId}/items")]
     [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorCantidadInvalida), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorProductoNoEncontrado), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorStockInsuficiente), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AgregarItem(Guid userId, AddItemRequest request)
     {
         ValidarDatos();
@@ -68,6 +74,10 @@ public class CartController : ControllerBase
     /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
     [HttpPut("{userId}/items/{productId}")]
     [ProducesResponseType(typeof(CartResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorCantidadInvalida), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorProductoNoEncontrado), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorStockInsuficiente), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ActualizarCantidad(Guid userId, Guid productId, UpdateItemRequest request)
     {
         ValidarDatos();
@@ -86,6 +96,8 @@ public class CartController : ControllerBase
     /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
     [HttpDelete("{userId}/items/{productId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorProductoNoEncontrado), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public IActionResult QuitarItem(Guid userId, Guid productId)
     {
         servicio.QuitarItem(userId, productId);
@@ -101,7 +113,8 @@ public class CartController : ControllerBase
     /// <response code="500">CRT-005: Error interno al procesar el carrito.</response>
     [HttpDelete("{userId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorCarritoNoEncontrado), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public IActionResult VaciarCarrito(Guid userId)
     {
         servicio.VaciarCarrito(userId);
