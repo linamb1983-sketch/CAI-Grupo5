@@ -13,13 +13,16 @@ public class NotificationService
     private NotificationRepository repositorio;
     private IHttpClientFactory httpClientFactory;
     private IConfiguration configuracion;
+    private IHttpContextAccessor httpContextAccessor;
 
-    // Recibe el repositorio, la fábrica de clientes HTTP y la configuración (appsettings.json)
-    public NotificationService(NotificationRepository repositorio, IHttpClientFactory httpClientFactory, IConfiguration configuracion)
+    // Recibe el repositorio, la fábrica de clientes HTTP, la configuración (appsettings.json)
+    // y el acceso al pedido actual (para leer el Correlation ID)
+    public NotificationService(NotificationRepository repositorio, IHttpClientFactory httpClientFactory, IConfiguration configuracion, IHttpContextAccessor httpContextAccessor)
     {
         this.repositorio = repositorio;
         this.httpClientFactory = httpClientFactory;
         this.configuracion = configuracion;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     // POST: registra la notificación y simula el envío.
@@ -87,7 +90,7 @@ public class NotificationService
         string direccion = configuracion["Services:Users:BaseUrl"];
         string url = $"{direccion}/api/users/{usuarioId}";
 
-        HttpClient cliente = httpClientFactory.CreateClient();
+        HttpClient cliente = CrearClienteConCorrelationId();
         HttpResponseMessage respuesta = await cliente.GetAsync(url);
 
         // Primero se mira el código HTTP (lo pide la consigna)
@@ -101,6 +104,27 @@ public class NotificationService
         {
             throw new Exception($"Users API respondió con error {(int)respuesta.StatusCode}.");
         }
+    }
+
+    // Crea el cliente HTTP y le agrega el Correlation ID del pedido actual,
+    // así Users usa el mismo número y el pedido se puede seguir en los logs de los dos servicios.
+    private HttpClient CrearClienteConCorrelationId()
+    {
+        HttpClient cliente = httpClientFactory.CreateClient();
+
+        HttpContext context = httpContextAccessor.HttpContext;
+
+        if (context != null)
+        {
+            string correlationId = $"{context.Items["CorrelationId"]}";
+
+            if (correlationId != "")
+            {
+                cliente.DefaultRequestHeaders.Add("X-Correlation-Id", correlationId);
+            }
+        }
+
+        return cliente;
     }
 
     // Revisa que el tipo sea uno de los tres permitidos
