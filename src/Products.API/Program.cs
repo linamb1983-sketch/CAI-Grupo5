@@ -23,7 +23,8 @@ builder.Host.UseSerilog((contexto, configuracion) =>
         .Enrich.WithProperty("Servicio", "Products.API")
         .Enrich.WithProperty("CorrelationId", "-")
         .Enrich.WithProperty("Endpoint", "-")
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
+        // En la consola cada línea muestra: hora, nivel, servicio, endpoint y Correlation ID (sección 5.3)
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Servicio}] [{Endpoint}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
         .WriteTo.File(new JsonFormatter(renderMessage: true), "logs/products-.log", rollingInterval: RollingInterval.Day);
 });
 
