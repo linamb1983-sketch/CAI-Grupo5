@@ -83,6 +83,8 @@ public class UserService
             if (usuario.IntentosFallidos >= MaximoIntentosFallidos)
             {
                 usuario.Activo = false;
+                throw new BusinessRuleException(ErrorCodes.USR_004,
+                    "Su cuenta fue bloqueada por superar el máximo de intentos fallidos. Contacte a soporte.");
             }
 
             throw new BusinessRuleException(ErrorCodes.USR_003, "Credenciales incorrectas.");
