@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Cart.API.HealthChecks;
 using Cart.API.ExceptionHandlers;
 using Cart.API.Middlewares;
 using Cart.API.Repositories;
@@ -57,6 +59,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<CartRepository>();
 builder.Services.AddScoped<CartService>();
 
+
+// Health Checks (sección 5.4).
+// "live" = el proceso está vivo. "ready" = está listo para recibir pedidos.
+builder.Services.AddHealthChecks()
+    .AddCheck<ProcesoHealthCheck>("proceso", tags: new[] { "live" })
+    .AddCheck<CartHealthCheck>("repositorio", tags: new[] { "ready" });
+
 var app = builder.Build();
 
 // Le pone el Correlation ID a cada pedido. Va primero para que todo lo demás ya lo tenga.
@@ -79,5 +88,24 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+// /health = todos los chequeos, /health/ready = los de "ready", /health/live = los de "live"
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthResponseWriter.Escribir
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = HealthResponseWriter.SoloReady,
+    ResponseWriter = HealthResponseWriter.Escribir
+});
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = HealthResponseWriter.SoloLive,
+    ResponseWriter = HealthResponseWriter.Escribir
+});
 
 app.Run();
