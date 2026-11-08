@@ -14,13 +14,16 @@ public class CartService
     private CartRepository repositorio;
     private IHttpClientFactory httpClientFactory;
     private IConfiguration configuracion;
+    private IHttpContextAccessor httpContextAccessor;
 
-    // Recibe el repositorio, la fábrica de clientes HTTP y la configuración (appsettings.json)
-    public CartService(CartRepository repositorio, IHttpClientFactory httpClientFactory, IConfiguration configuracion)
+    // Recibe el repositorio, la fábrica de clientes HTTP, la configuración (appsettings.json)
+    // y el acceso al pedido actual (para leer el Correlation ID)
+    public CartService(CartRepository repositorio, IHttpClientFactory httpClientFactory, IConfiguration configuracion, IHttpContextAccessor httpContextAccessor)
     {
         this.repositorio = repositorio;
         this.httpClientFactory = httpClientFactory;
         this.configuracion = configuracion;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     // GET: devuelve el carrito del usuario. Si no tiene carrito, CRT-001.
@@ -186,7 +189,7 @@ public class CartService
         string direccion = configuracion["Services:Products:BaseUrl"];
         string url = $"{direccion}/api/products/{productoId}";
 
-        HttpClient cliente = httpClientFactory.CreateClient();
+        HttpClient cliente = CrearClienteConCorrelationId();
         HttpResponseMessage respuesta = await cliente.GetAsync(url);
 
         // Primero se mira el código HTTP, antes de leer la respuesta (lo pide la consigna)
@@ -203,6 +206,27 @@ public class CartService
 
         ProductInfo producto = await respuesta.Content.ReadFromJsonAsync<ProductInfo>();
         return producto;
+    }
+
+    // Crea el cliente HTTP y le agrega el Correlation ID del pedido actual,
+    // así Products usa el mismo número y el pedido se puede seguir en los logs de los dos servicios.
+    private HttpClient CrearClienteConCorrelationId()
+    {
+        HttpClient cliente = httpClientFactory.CreateClient();
+
+        HttpContext context = httpContextAccessor.HttpContext;
+
+        if (context != null)
+        {
+            string correlationId = $"{context.Items["CorrelationId"]}";
+
+            if (correlationId != "")
+            {
+                cliente.DefaultRequestHeaders.Add("X-Correlation-Id", correlationId);
+            }
+        }
+
+        return cliente;
     }
 
     // Busca un producto dentro del carrito. Si no está, devuelve null.

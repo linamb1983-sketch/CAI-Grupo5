@@ -34,4 +34,11 @@ public class CartRepository
     {
         carritos.Remove(carrito);
     }
+
+    // Devuelve cuántos carritos hay guardados.
+    // La usa el Health Check para saber si el repositorio responde.
+    public int Cantidad()
+    {
+        return carritos.Count;
+    }
 }
