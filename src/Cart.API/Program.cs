@@ -23,7 +23,7 @@ builder.Host.UseSerilog((contexto, configuracion) =>
         .Enrich.WithProperty("Servicio", "Cart.API")
         .Enrich.WithProperty("CorrelationId", "-")
         .Enrich.WithProperty("Endpoint", "-")
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Servicio}] [{Endpoint}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
         .WriteTo.File(new JsonFormatter(renderMessage: true), "logs/cart-.log", rollingInterval: RollingInterval.Day);
 });
 

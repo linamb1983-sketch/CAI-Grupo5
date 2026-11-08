@@ -102,6 +102,14 @@ public class ErrorStockInsuficiente
     /// <example>CRT-003</example>
     public string ErrorCode { get; set; } = string.Empty;
 
+    /// <summary>Mensaje del catálogo de errores.</summary>
+    /// <example>Stock insuficiente. Disponible: 1, solicitado: 5.</example>
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>Id para seguir el pedido en los logs (mismo valor que el header X-Correlation-Id).</summary>
+    /// <example>8b1f2c3d-4e5a-4b6c-9d7e-0f1a2b3c4d5e</example>
+    public string CorrelationId { get; set; } = string.Empty;
+
 }
 
 /// <summary>CRT-004 (400): la cantidad es menor o igual a cero.</summary>
