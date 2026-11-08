@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Notifications.API.HealthChecks;
 using Notifications.API.ExceptionHandlers;
 using Notifications.API.Middlewares;
 using Notifications.API.Repositories;
@@ -57,6 +59,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<NotificationRepository>();
 builder.Services.AddScoped<NotificationService>();
 
+
+// Health Checks
+// "live" = el proceso está vivo. "ready" = está listo para recibir pedidos.
+builder.Services.AddHealthChecks()
+    .AddCheck<ProcesoHealthCheck>("proceso", tags: new[] { "live" })
+    .AddCheck<NotificationsHealthCheck>("repositorio", tags: new[] { "ready" });
+
 var app = builder.Build();
 
 // Le pone el Correlation ID a cada pedido. Va primero para que todo lo demás ya lo tenga.
@@ -79,5 +88,24 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+// /health = todos los chequeos, /health/ready = los de "ready", /health/live = los de "live"
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthResponseWriter.Escribir
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = HealthResponseWriter.SoloReady,
+    ResponseWriter = HealthResponseWriter.Escribir
+});
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = HealthResponseWriter.SoloLive,
+    ResponseWriter = HealthResponseWriter.Escribir
+});
 
 app.Run();
