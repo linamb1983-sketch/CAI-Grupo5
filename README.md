@@ -145,6 +145,65 @@ Los errores los arman los `IExceptionHandler` de cada servicio. Nunca se muestra
 - Los errores de negocio van como **Warning** y los errores inesperados como **Error**.
 - Cada pedido lleva un **X-Correlation-Id**. Si el pedido no lo trae, el servicio crea uno. Se devuelve en el header de la respuesta, en el campo `correlationId` de los errores y se pasa a los otros servicios cuando se los llama.
 
+## Health Checks
+
+Cada servicio expone tres endpoints de salud (sección 5.4 de la consigna):
+
+| Endpoint | Qué devuelve |
+|---|---|
+| `/health` | Estado general: todos los chequeos |
+| `/health/ready` | Solo el chequeo `ready`: el servicio está listo para recibir pedidos |
+| `/health/live` | Solo el chequeo `live`: el proceso está en ejecución |
+
+La respuesta es siempre JSON con este formato:
+
+```json
+{
+  "estado": "Healthy",
+  "servicio": "Users.API",
+  "duracionMs": 1.4,
+  "chequeos": [
+    {
+      "nombre": "repositorio",
+      "estado": "Healthy",
+      "descripcion": "El repositorio responde (2 usuarios)."
+    }
+  ]
+}
+```
+
+- `Healthy` → HTTP 200. `Unhealthy` → HTTP 503.
+- El chequeo `live` verifica que el proceso esté en ejecución.
+- El chequeo `ready` verifica que el repositorio de datos responda.
+
+Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Orders.API**.
+
+## Capturas de Swagger
+
+### Products.API
+
+| Archivo | Endpoint | Resultado |
+|---|---|---|
+| [products-404-PRD-001.png](docs/products-404-PRD-001.png) | GET /api/products/{id} | 404 PRD-001 |
+| [products-400-PRD-002.png](docs/products-400-PRD-002.png) | POST /api/products | 400 PRD-002 |
+| [products-409-PRD-003.png](docs/products-409-PRD-003.png) | POST /api/products | 409 PRD-003 |
+
+### Users.API
+
+| Archivo | Endpoint | Resultado |
+|---|---|---|
+| [users-201-USR-register.png](docs/users-201-USR-register.png) | POST /api/users/register | 201 Creado |
+| [users-200-USR-login.png](docs/users-200-USR-login.png) | POST /api/users/login | 200 OK |
+| [users-400-USR-002.png](docs/users-400-USR-002.png) | POST /api/users/register | 400 USR-002 |
+| [users-409-USR-001.png](docs/users-409-USR-001.png) | POST /api/users/register | 409 USR-001 |
+| [users-401-USR-003.png](docs/users-401-USR-003.png) | POST /api/users/login | 401 USR-003 |
+| [users-403-USR-004.png](docs/users-403-USR-004.png) | POST /api/users/login | 403 USR-004 |
+| [users-403-USR-005.png](docs/users-403-USR-005.png) | POST /api/users/login | 403 USR-005 |
+| [users-404-USR-007.png](docs/users-404-USR-007.png) | GET /api/users/{id} | 404 USR-007 |
+| [users-health.png](docs/users-health.png) | /health | Healthy |
+| [users-health-ready.png](docs/users-health-ready.png) | /health/ready | Healthy |
+| [users-health-live.png](docs/users-health-live.png) | /health/live | Healthy |
+
 ## Estructura del proyecto
 
 ```
@@ -170,6 +229,7 @@ Products.API/
 ├── Repositories/       # Guarda los datos (en memoria por ahora)
 ├── Exceptions/         # NotFoundException, ValidationException, BusinessRuleException y ErrorCodes
 ├── ExceptionHandlers/  # Un IExceptionHandler por tipo de excepción
+├── HealthChecks/       # ProcesoHealthCheck, chequeo específico y HealthResponseWriter
 ├── Middlewares/        # CorrelationIdMiddleware
 ├── logs/               # Archivos de log de Serilog
 └── Program.cs
