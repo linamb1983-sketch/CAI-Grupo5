@@ -62,6 +62,7 @@ public class NotificationsController : ControllerBase
 
     // Si los datos no cumplen las reglas del DTO, junta todos los errores
     // separados por punto y coma y corta con NTF-002.
+    // Si el JSON vino mal armado, devuelve un mensaje propio en español.
     private void ValidarDatos()
     {
         if (ModelState.IsValid)
@@ -70,13 +71,34 @@ public class NotificationsController : ControllerBase
         }
 
         string errores = "";
+        bool jsonInvalido = false;
 
-        foreach (var campo in ModelState.Values)
+        foreach (var item in ModelState)
         {
-            foreach (var error in campo.Errors)
+            string campo = item.Key;
+
+            foreach (var error in item.Value.Errors)
             {
-                errores = errores + error.ErrorMessage + "; ";
+                // Los errores de JSON roto vienen con el campo vacío o empezando con "$"
+                if (campo == "" || campo.StartsWith("$"))
+                {
+                    jsonInvalido = true;
+                }
+                else
+                {
+                    // Si ya hay un error anotado, se separa del siguiente con "; "
+                    if (errores != "")
+                    {
+                        errores = errores + "; ";
+                    }
+                    errores = errores + error.ErrorMessage;
+                }
             }
+        }
+
+        if (jsonInvalido)
+        {
+            errores = "El cuerpo del pedido no es un JSON válido.";
         }
 
         if (errores == "")
