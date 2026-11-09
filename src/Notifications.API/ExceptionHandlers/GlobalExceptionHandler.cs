@@ -4,20 +4,37 @@ using Notifications.API.Exceptions;
 namespace Notifications.API.ExceptionHandlers;
 
 // Red de seguridad: ataja cualquier error que no atajaron los anteriores.
-// Devuelve un 500 con NTF-004 y NO muestra el detalle técnico del error.
+// Devuelve un 500 con NTF-004. El nivel de detalle depende del entorno:
+// en Development muestra el mensaje del error, en Production uno genérico.
+// El stack trace nunca va en la respuesta, solo en el log.
 public class GlobalExceptionHandler : IExceptionHandler
 {
     private ILogger<GlobalExceptionHandler> logger;
+    private IConfiguration configuracion;
 
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    // Recibe el logger y la configuración (appsettings)
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IConfiguration configuracion)
     {
         this.logger = logger;
+        this.configuracion = configuracion;
     }
 
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
-        // Es un error inesperado: se loguea como Error, con el detalle técnico (solo en el log, nunca en la respuesta)
+        // Es un error inesperado: se loguea como Error, con el detalle técnico completo
         logger.LogError(exception, "Error inesperado {ErrorCode}", ErrorCodes.NTF_004);
+
+        // Por defecto (Production) se muestra un mensaje genérico
+        string detalle = "Ocurrió un error inesperado.";
+
+        // Lee la opción del appsettings como verdadero/falso
+        bool mostrarDetalle = configuracion.GetValue<bool>("Errores:MostrarDetalle");
+
+        // En Development se muestra el mensaje del error para ayudar a encontrarlo
+        if (mostrarDetalle)
+        {
+            detalle = exception.Message;
+        }
 
         context.Response.StatusCode = 500;
 
@@ -26,7 +43,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
             title = "Internal Server Error",
             status = 500,
-            detail = "Ocurrió un error inesperado.",
+            detail = detalle,
             instance = context.Request.Path.Value,
             errorCode = ErrorCodes.NTF_004,
             errorMessage = "Error interno al procesar la notificación.",
