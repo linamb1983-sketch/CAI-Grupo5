@@ -31,4 +31,11 @@ public class NotificationRepository
 
         return resultado;
     }
+
+    // Devuelve cuántas notificaciones hay guardadas.
+    // La usa el Health Check para saber si el repositorio responde.
+    public int Cantidad()
+    {
+        return notificaciones.Count;
+    }
 }

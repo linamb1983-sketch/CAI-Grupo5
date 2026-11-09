@@ -30,6 +30,9 @@ public class NotificationsController : ControllerBase
     /// <response code="500">NTF-004: Error interno al procesar la notificación.</response>
     [HttpPost("send")]
     [ProducesResponseType(typeof(NotificationResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorDatosInvalidos), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorUsuarioNoEncontrado), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Enviar(SendNotificationRequest request)
     {
         ValidarDatos();
@@ -49,6 +52,8 @@ public class NotificationsController : ControllerBase
     /// <response code="500">NTF-004: Error interno al procesar la notificación.</response>
     [HttpGet("{userId}")]
     [ProducesResponseType(typeof(List<NotificationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorSinNotificaciones), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
     public IActionResult ObtenerPorUsuario(Guid userId)
     {
         List<NotificationResponse> notificaciones = servicio.ObtenerPorUsuario(userId);
