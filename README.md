@@ -176,7 +176,7 @@ La respuesta es siempre JSON con este formato:
 - El chequeo `live` verifica que el proceso esté en ejecución.
 - El chequeo `ready` verifica que el repositorio de datos responda.
 
-Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Orders.API**.
+Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Orders.API**, **Cart.API**, **Notifications.API**.
 
 ## Capturas de Swagger
 
@@ -203,6 +203,45 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 | [users-health.png](docs/users-health.png) | /health | Healthy |
 | [users-health-ready.png](docs/users-health-ready.png) | /health/ready | Healthy |
 | [users-health-live.png](docs/users-health-live.png) | /health/live | Healthy |
+
+### Orders.API
+
+| Archivo | Endpoint | Resultado |
+|---|---|---|
+| [setup-user-register-201.png](docs/capturas/orders/setup-user-register-201.png) | POST /api/users/register (preparación) | 201 Creado |
+| [setup-product-create-201.png](docs/capturas/orders/setup-product-create-201.png) | POST /api/products (preparación) | 201 Creado |
+| [post-order-201.png](docs/capturas/orders/post-order-201.png) | POST /api/orders | 201 Creado |
+| [post-stock-422-ORD-005.png](docs/capturas/orders/post-stock-422-ORD-005.png) | POST /api/orders | 422 ORD-005 |
+| [put-status-409-ORD-006.png](docs/capturas/orders/put-status-409-ORD-006.png) | PUT /api/orders/{id}/status | 409 ORD-006 |
+| [serilog-warning-ORD-006.jpg](docs/capturas/orders/serilog-warning-ORD-006.jpg) | Consola de Serilog | Warning ORD-006 |
+
+### Cart.API
+
+| Archivo | Endpoint | Resultado |
+|---|---|---|
+| [cart-200-agregar.png](docs/cart-200-agregar.png) | POST /api/cart/{userId}/items | 200 OK |
+| [cart-404-CRT-001.png](docs/cart-404-CRT-001.png) | GET /api/cart/{userId} | 404 CRT-001 |
+| [cart-404-CRT-002.png](docs/cart-404-CRT-002.png) | POST /api/cart/{userId}/items | 404 CRT-002 |
+| [cart-422-CRT-003.png](docs/cart-422-CRT-003.png) | POST /api/cart/{userId}/items | 422 CRT-003 |
+| [cart-400-CRT-004.png](docs/cart-400-CRT-004.png) | POST /api/cart/{userId}/items | 400 CRT-004 |
+| [cart-500-CRT-005.png](docs/cart-500-CRT-005.png) | POST /api/cart/{userId}/items (Products apagado) | 500 CRT-005 |
+| [cart-health.png](docs/cart-health.png) | /health | Healthy |
+| [cart-health-ready.png](docs/cart-health-ready.png) | /health/ready | Healthy |
+| [cart-health-live.png](docs/cart-health-live.png) | /health/live | Healthy |
+
+### Notifications.API
+
+| Archivo | Endpoint | Resultado |
+|---|---|---|
+| [notifications-201-enviar.png](docs/notifications-201-enviar.png) | POST /api/notifications/send | 201 Creado |
+| [notifications-200-listar.png](docs/notifications-200-listar.png) | GET /api/notifications/{userId} | 200 OK |
+| [notifications-400-NTF-002.png](docs/notifications-400-NTF-002.png) | POST /api/notifications/send | 400 NTF-002 |
+| [notifications-404-NTF-001.png](docs/notifications-404-NTF-001.png) | POST /api/notifications/send | 404 NTF-001 |
+| [notifications-404-NTF-003.png](docs/notifications-404-NTF-003.png) | GET /api/notifications/{userId} | 404 NTF-003 |
+| [notifications-500-NTF-004.png](docs/notifications-500-NTF-004.png) | POST /api/notifications/send (Users apagado) | 500 NTF-004 |
+| [notifications-health.png](docs/notifications-health.png) | /health | Healthy |
+| [notifications-health-ready.png](docs/notifications-health-ready.png) | /health/ready | Healthy |
+| [notifications-health-live.png](docs/notifications-health-live.png) | /health/live | Healthy |
 
 ## Estructura del proyecto
 
