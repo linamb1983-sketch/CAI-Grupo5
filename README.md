@@ -221,10 +221,21 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 |---|---|---|
 | [setup-user-register-201.png](docs/capturas/orders/setup-user-register-201.png) | POST /api/users/register (preparación) | 201 Creado |
 | [setup-product-create-201.png](docs/capturas/orders/setup-product-create-201.png) | POST /api/products (preparación) | 201 Creado |
-| [post-order-201.png](docs/capturas/orders/post-order-201.png) | POST /api/orders | 201 Creado |
-| [post-stock-422-ORD-005.png](docs/capturas/orders/post-stock-422-ORD-005.png) | POST /api/orders | 422 ORD-005 |
-| [put-status-409-ORD-006.png](docs/capturas/orders/put-status-409-ORD-006.png) | PUT /api/orders/{id}/status | 409 ORD-006 |
-| [serilog-warning-ORD-006.jpg](docs/capturas/orders/serilog-warning-ORD-006.jpg) | Consola de Serilog | Warning ORD-006 |
+| [orders-201-crear.png](docs/capturas/orders/orders-201-crear.png) | POST /api/orders | 201 Creado |
+| [orders-200-obtener.png](docs/capturas/orders/orders-200-obtener.png) | GET /api/orders/{id} | 200 OK |
+| [orders-200-listar.png](docs/capturas/orders/orders-200-listar.png) | GET /api/orders?usuarioId={id} | 200 OK |
+| [orders-200-cambiar-estado.png](docs/capturas/orders/orders-200-cambiar-estado.png) | PUT /api/orders/{id}/status (Pendiente → Confirmada) | 200 OK |
+| [orders-400-ORD-002.png](docs/capturas/orders/orders-400-ORD-002.png) | POST /api/orders (cantidad 0) | 400 ORD-002 |
+| [orders-404-ORD-001.png](docs/capturas/orders/orders-404-ORD-001.png) | GET /api/orders/{id} (orden inexistente) | 404 ORD-001 |
+| [orders-404-ORD-003.png](docs/capturas/orders/orders-404-ORD-003.png) | POST /api/orders (usuario inexistente) | 404 ORD-003 |
+| [orders-404-ORD-004.png](docs/capturas/orders/orders-404-ORD-004.png) | POST /api/orders (producto inexistente) | 404 ORD-004 |
+| [orders-422-ORD-005.png](docs/capturas/orders/orders-422-ORD-005.png) | POST /api/orders (pide 6, hay 5) | 422 ORD-005 |
+| [orders-409-ORD-006.png](docs/capturas/orders/orders-409-ORD-006.png) | PUT /api/orders/{id}/status (Confirmada → Pendiente) | 409 ORD-006 |
+| [orders-500-ORD-007.png](docs/capturas/orders/orders-500-ORD-007.png) | POST /api/orders (Users apagado; en Development se ve el detalle técnico) | 500 ORD-007 |
+| [orders-serilog-consola.png](docs/capturas/orders/orders-serilog-consola.png) | Consola de Serilog: POST /api/orders (llama a Users y Products con el mismo Correlation ID) y PUT con regla de negocio | Information + Warning ORD-006 |
+| [orders-health.png](docs/capturas/orders/orders-health.png) | /health | Healthy |
+| [orders-health-ready.png](docs/capturas/orders/orders-health-ready.png) | /health/ready | Healthy |
+| [orders-health-live.png](docs/capturas/orders/orders-health-live.png) | /health/live | Healthy |
 
 ### Cart.API
 
