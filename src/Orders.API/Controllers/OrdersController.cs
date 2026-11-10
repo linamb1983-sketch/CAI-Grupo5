@@ -111,13 +111,33 @@ public class OrdersController : ControllerBase
         }
 
         string errores = "";
+        bool jsonInvalido = false;
 
-        foreach (var campo in ModelState.Values)
+        foreach (var item in ModelState)
         {
-            foreach (var error in campo.Errors)
+            string campo = item.Key;
+
+            foreach (var error in item.Value.Errors)
             {
-                errores = errores + error.ErrorMessage + "; ";
+                if (campo == "" || campo.StartsWith("$"))
+                {
+                    jsonInvalido = true;
+                }
+                else
+                {
+                    if (errores != "")
+                    {
+                        errores = errores + "; ";
+                    }
+
+                    errores = errores + error.ErrorMessage;
+                }
             }
+        }
+
+        if (jsonInvalido)
+        {
+            errores = "El cuerpo del pedido no es un JSON válido.";
         }
 
         if (errores == "")
