@@ -105,6 +105,7 @@ Los errores los arman los `IExceptionHandler` de cada servicio. Nunca se muestra
 | USR-004 | 403 | Usuario bloqueado por demasiados intentos fallidos. |
 | USR-005 | 403 | Usuario bloqueado por detección de fraude. |
 | USR-006 | 500 | Error interno al procesar el usuario. |
+| USR-007 | 404 | Usuario no encontrado. (Agregado propio: no está en la consigna; lo usa `GET /api/users/{id}`, que consultan Orders y Notifications.) |
 
 ### Orders.API
 
