@@ -155,7 +155,7 @@ public class OrderService
     // Consulta Users API y traduce un 404 al código de Orders.
     private async Task ValidarUsuario(Guid usuarioId)
     {
-        string direccion = configuracion["Services:Users:BaseUrl"]!;
+        string direccion = configuracion["Services:Users:BaseUrl"];
         string url = $"{direccion}/api/users/{usuarioId}";
         HttpClient cliente = CrearClienteConCorrelationId();
 
@@ -175,7 +175,7 @@ public class OrderService
     // Consulta Products API y obtiene precio y stock del producto.
     private async Task<ProductLookupResponse> ObtenerProducto(Guid productoId)
     {
-        string direccion = configuracion["Services:Products:BaseUrl"]!;
+        string direccion = configuracion["Services:Products:BaseUrl"];
         string url = $"{direccion}/api/products/{productoId}";
         HttpClient cliente = CrearClienteConCorrelationId();
 
