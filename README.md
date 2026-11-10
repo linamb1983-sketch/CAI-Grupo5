@@ -232,7 +232,7 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 | [orders-422-ORD-005.png](docs/capturas/orders/orders-422-ORD-005.png) | POST /api/orders (pide 6, hay 5) | 422 ORD-005 |
 | [orders-409-ORD-006.png](docs/capturas/orders/orders-409-ORD-006.png) | PUT /api/orders/{id}/status (Confirmada → Pendiente) | 409 ORD-006 |
 | [orders-500-ORD-007.png](docs/capturas/orders/orders-500-ORD-007.png) | POST /api/orders (Users apagado; en Development se ve el detalle técnico) | 500 ORD-007 |
-| [serilog-warning-ORD-006.jpg](docs/capturas/orders/serilog-warning-ORD-006.jpg) | Consola de Serilog | Warning ORD-006 |
+| [orders-serilog-consola.png](docs/capturas/orders/orders-serilog-consola.png) | Consola de Serilog: POST /api/orders (llama a Users y Products con el mismo Correlation ID) y PUT con regla de negocio | Information + Warning ORD-006 |
 | [orders-health.png](docs/capturas/orders/orders-health.png) | /health | Healthy |
 | [orders-health-ready.png](docs/capturas/orders/orders-health-ready.png) | /health/ready | Healthy |
 | [orders-health-live.png](docs/capturas/orders/orders-health-live.png) | /health/live | Healthy |
