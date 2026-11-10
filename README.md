@@ -194,6 +194,9 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 | [products-409-PRD-004.png](docs/products-409-PRD-004.png) | DELETE /api/products/{id} (producto con una orden Pendiente) | 409 PRD-004 |
 | [products-204-eliminar.png](docs/products-204-eliminar.png) | DELETE /api/products/{id} (la orden del producto ya está Enviada) | 204 |
 | [products-500-PRD-005.png](docs/products-500-PRD-005.png) | DELETE /api/products/{id} (Orders apagado; en Development se ve el detalle técnico) | 500 PRD-005 |
+| [products-health.png](docs/products-health.png) | /health | Healthy |
+| [products-health-ready.png](docs/products-health-ready.png) | /health/ready | Healthy |
+| [products-health-live.png](docs/products-health-live.png) | /health/live | Healthy |
 
 ### Users.API
 
