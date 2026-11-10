@@ -54,7 +54,6 @@ public class OrdersController : ControllerBase
 
     /// <summary>Crea una orden luego de validar el usuario, productos y stock.</summary>
     /// <param name="request">Datos de la orden a crear.</param>
-    /// <param name="cancellationToken">Token para cancelar la solicitud.</param>
     /// <response code="201">Orden creada.</response>
     /// <response code="400">ORD-002: los datos enviados son inválidos.</response>
     /// <response code="404">ORD-003: usuario no encontrado; ORD-004: producto no encontrado.</response>
@@ -67,11 +66,11 @@ public class OrdersController : ControllerBase
     [ProducesResponseType(typeof(ErrorProductoNoEncontrado), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorStockInsuficiente), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Crear(CreateOrderRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Crear(CreateOrderRequest request)
     {
         ValidarDatos();
 
-        OrderResponse orden = await servicio.Crear(request, cancellationToken);
+        OrderResponse orden = await servicio.Crear(request);
         return CreatedAtAction(nameof(ObtenerPorId), new { id = orden.Id }, orden);
     }
 
@@ -89,11 +88,11 @@ public class OrdersController : ControllerBase
     [ProducesResponseType(typeof(ErrorOrdenNoEncontrada), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorCambioEstadoNoPermitido), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
-    public ActionResult<UpdateOrderStatusResponse> ModificarEstado(Guid id, UpdateOrderStatusRequest request)
+    public IActionResult ModificarEstado(Guid id, UpdateOrderStatusRequest request)
     {
         ValidarDatos();
 
-        if (request == null || string.IsNullOrWhiteSpace(request.Estado))
+        if (request == null || request.Estado == null || request.Estado.Trim() == "")
         {
             throw new ValidationException(ErrorCodes.ORD_002, "Los datos de la orden son inválidos.");
         }

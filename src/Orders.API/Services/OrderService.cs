@@ -54,17 +54,16 @@ public class OrderService
     }
 
     // Valida referencias y stock antes de guardar la orden.
-    public async Task<OrderResponse> Crear(CreateOrderRequest request, CancellationToken cancellationToken)
+    public async Task<OrderResponse> Crear(CreateOrderRequest request)
     {
         if (request.UsuarioId == Guid.Empty || request.Items == null || request.Items.Count == 0)
         {
             throw new ValidationException(ErrorCodes.ORD_002, "Los datos de la orden son inválidos.");
         }
 
-        await ValidarUsuario(request.UsuarioId, cancellationToken);
+        await ValidarUsuario(request.UsuarioId);
 
         List<ProductLookupResponse> productos = new List<ProductLookupResponse>();
-        List<Guid> productosConsultados = new List<Guid>();
         List<OrderItem> items = new List<OrderItem>();
         decimal total = 0;
 
@@ -75,12 +74,11 @@ public class OrderService
                 throw new ValidationException(ErrorCodes.ORD_002, "Los datos de la orden son inválidos.");
             }
 
-            ProductLookupResponse? producto = BuscarProductoEnLista(productos, productosConsultados, itemRequest.ProductoId);
+            ProductLookupResponse? producto = BuscarProductoEnLista(productos, itemRequest.ProductoId);
 
             if (producto == null)
             {
-                producto = await ObtenerProducto(itemRequest.ProductoId, cancellationToken);
-                productosConsultados.Add(itemRequest.ProductoId);
+                producto = await ObtenerProducto(itemRequest.ProductoId);
                 productos.Add(producto);
             }
 
@@ -89,7 +87,7 @@ public class OrderService
             {
                 if (otroItem.ProductoId == itemRequest.ProductoId)
                 {
-                    cantidadSolicitada += otroItem.Cantidad;
+                    cantidadSolicitada = cantidadSolicitada + otroItem.Cantidad;
                 }
             }
 
@@ -108,7 +106,7 @@ public class OrderService
             };
 
             items.Add(item);
-            total += item.PrecioUnitario * item.Cantidad;
+            total = total + item.PrecioUnitario * item.Cantidad;
         }
 
         Order orden = new Order
@@ -136,11 +134,11 @@ public class OrderService
             throw new NotFoundException(ErrorCodes.ORD_001, "Orden no encontrada.");
         }
 
-        if (!PuedeCambiarEstado(orden.Estado, estadoNuevo))
+        if (PuedeCambiarEstado(orden.Estado, estadoNuevo) == false)
         {
             throw new BusinessRuleException(
                 ErrorCodes.ORD_006,
-                $"Una orden en estado '{orden.Estado}' no puede volver a '{estadoNuevo}'.");
+                $"Una orden en estado '{orden.Estado}' no puede pasar a '{estadoNuevo}'.");
         }
 
         orden.Estado = estadoNuevo;
@@ -155,79 +153,66 @@ public class OrderService
     }
 
     // Consulta Users API y traduce un 404 al código de Orders.
-    private async Task ValidarUsuario(Guid usuarioId, CancellationToken cancellationToken)
+    private async Task ValidarUsuario(Guid usuarioId)
     {
-        string direccion = ObtenerDireccionBase("Services:Users:BaseUrl");
+        string direccion = configuracion["Services:Users:BaseUrl"];
         string url = $"{direccion}/api/users/{usuarioId}";
         HttpClient cliente = CrearClienteConCorrelationId();
 
-        using HttpResponseMessage respuesta = await cliente.GetAsync(url, cancellationToken);
+        HttpResponseMessage respuesta = await cliente.GetAsync(url);
 
         if (respuesta.StatusCode == HttpStatusCode.NotFound)
         {
             throw new NotFoundException(ErrorCodes.ORD_003, "Usuario no encontrado al crear la orden.");
         }
 
-        if (!respuesta.IsSuccessStatusCode)
+        if (respuesta.IsSuccessStatusCode == false)
         {
-            throw new InvalidOperationException($"Users API respondió con HTTP {(int)respuesta.StatusCode}.");
+            throw new Exception($"Users API respondió con HTTP {(int)respuesta.StatusCode}.");
         }
     }
 
     // Consulta Products API y obtiene precio y stock del producto.
-    private async Task<ProductLookupResponse> ObtenerProducto(Guid productoId, CancellationToken cancellationToken)
+    private async Task<ProductLookupResponse> ObtenerProducto(Guid productoId)
     {
-        string direccion = ObtenerDireccionBase("Services:Products:BaseUrl");
+        string direccion = configuracion["Services:Products:BaseUrl"];
         string url = $"{direccion}/api/products/{productoId}";
         HttpClient cliente = CrearClienteConCorrelationId();
 
-        using HttpResponseMessage respuesta = await cliente.GetAsync(url, cancellationToken);
+        HttpResponseMessage respuesta = await cliente.GetAsync(url);
 
         if (respuesta.StatusCode == HttpStatusCode.NotFound)
         {
             throw new NotFoundException(ErrorCodes.ORD_004, "Producto no encontrado al crear la orden.");
         }
 
-        if (!respuesta.IsSuccessStatusCode)
+        if (respuesta.IsSuccessStatusCode == false)
         {
-            throw new InvalidOperationException($"Products API respondió con HTTP {(int)respuesta.StatusCode}.");
+            throw new Exception($"Products API respondió con HTTP {(int)respuesta.StatusCode}.");
         }
 
-        ProductLookupResponse? producto = await respuesta.Content.ReadFromJsonAsync<ProductLookupResponse>(cancellationToken);
+        ProductLookupResponse? producto = await respuesta.Content.ReadFromJsonAsync<ProductLookupResponse>();
 
         if (producto == null)
         {
-            throw new InvalidOperationException("Products API devolvió una respuesta vacía.");
+            throw new Exception("Products API devolvió una respuesta vacía.");
         }
 
         return producto;
     }
 
     // Busca un producto ya consultado durante la misma creación.
-    private ProductLookupResponse? BuscarProductoEnLista(List<ProductLookupResponse> productos, List<Guid> ids, Guid productoId)
+    private ProductLookupResponse? BuscarProductoEnLista(List<ProductLookupResponse> productos, Guid productoId)
     {
-        for (int i = 0; i < ids.Count; i++)
+        foreach (ProductLookupResponse producto in productos)
         {
-            if (ids[i] == productoId)
+            if (producto.Id == productoId)
             {
-                return productos[i];
+                return producto;
             }
         }
 
         return null;
-    }
-
-    // Lee una URL de servicio y falla explícitamente si está mal configurada.
-    private string ObtenerDireccionBase(string clave)
-    {
-        string? direccion = configuracion[clave];
-
-        if (string.IsNullOrWhiteSpace(direccion) || !Uri.TryCreate(direccion, UriKind.Absolute, out Uri? uri))
-        {
-            throw new InvalidOperationException($"La configuración '{clave}' no contiene una URL válida.");
-        }
-
-        return uri.ToString().TrimEnd('/');
     }
 
     // Reenvía a Users y Products el identificador de la solicitud original.
@@ -236,11 +221,13 @@ public class OrderService
         HttpClient cliente = httpClientFactory.CreateClient();
         HttpContext? context = httpContextAccessor.HttpContext;
 
-        if (context != null && context.Items.TryGetValue("CorrelationId", out object? valor))
+        if (context != null)
         {
-            if (valor != null)
+            string correlationId = $"{context.Items["CorrelationId"]}";
+
+            if (correlationId != "")
             {
-                cliente.DefaultRequestHeaders.TryAddWithoutValidation("X-Correlation-Id", valor.ToString());
+                cliente.DefaultRequestHeaders.TryAddWithoutValidation("X-Correlation-Id", correlationId);
             }
         }
 
@@ -293,10 +280,10 @@ public class OrderService
         return respuesta;
     }
 
-    // Campos que Orders necesita leer de Products API.
     // Datos mínimos que Orders necesita leer de Products API.
     private class ProductLookupResponse
     {
+        public Guid Id { get; set; }
         public string Nombre { get; set; } = string.Empty;
         public decimal Precio { get; set; }
         public int Stock { get; set; }
