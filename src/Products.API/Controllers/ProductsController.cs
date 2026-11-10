@@ -97,7 +97,7 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Elimina un producto.
+    /// Elimina un producto. Antes le pregunta a Orders si el producto está en alguna orden activa.
     /// </summary>
     /// <param name="id">Id del producto a eliminar.</param>
     /// <response code="204">Producto eliminado (sin contenido).</response>
@@ -109,9 +109,9 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(typeof(ErrorProductoNoEncontrado), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorProductoConOrdenes), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
-    public IActionResult Eliminar(Guid id)
+    public async Task<IActionResult> Eliminar(Guid id)
     {
-        servicio.Eliminar(id);
+        await servicio.Eliminar(id);
         return NoContent();
     }
 

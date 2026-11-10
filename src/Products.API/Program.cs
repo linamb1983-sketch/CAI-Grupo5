@@ -49,6 +49,12 @@ builder.Services.AddExceptionHandler<BusinessRuleExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// Para que Products pueda llamar a Orders por HTTP (IHttpClientFactory)
+builder.Services.AddHttpClient();
+
+// Para que el Service pueda leer el Correlation ID del pedido actual y mandárselo a Orders
+builder.Services.AddHttpContextAccessor();
+
 // Nuestras clases
 // Singleton = una sola lista para toda la app (si no, se borraría en cada pedido)
 builder.Services.AddSingleton<ProductRepository>();

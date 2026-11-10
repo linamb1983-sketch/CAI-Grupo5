@@ -36,6 +36,7 @@ Cada puerto está fijo en el `appsettings.json` de su servicio (sección `Kestre
    Orders.API        --->  Products.API   (valida el producto, toma el precio y controla el stock)
    Cart.API          --->  Products.API   (valida el producto y controla el stock)
    Notifications.API --->  Users.API      (valida que el usuario exista)
+   Products.API      --->  Orders.API     (antes de borrar un producto, revisa que no tenga órdenes activas)
 ```
 
 - Los servicios se comunican por HTTP con `IHttpClientFactory` y se pasan el header `X-Correlation-Id`.
@@ -63,6 +64,8 @@ dotnet run --project src/Notifications.API
 ```
 
 Cada `dotnet run` va en una consola distinta.
+
+> **Importante:** para borrar un producto (`DELETE /api/products/{id}`) Orders.API tiene que estar levantado, porque Products le pregunta si el producto tiene órdenes activas (PRD-004). Si Orders está apagado, el borrado responde 500 PRD-005 y el producto no se borra.
 
 ## Formato de los errores
 
@@ -188,6 +191,7 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 | [products-404-PRD-001.png](docs/products-404-PRD-001.png) | GET /api/products/{id} | 404 PRD-001 |
 | [products-400-PRD-002.png](docs/products-400-PRD-002.png) | POST /api/products | 400 PRD-002 |
 | [products-409-PRD-003.png](docs/products-409-PRD-003.png) | POST /api/products | 409 PRD-003 |
+| [products-409-PRD-004.png](docs/products-409-PRD-004.png) | DELETE /api/products/{id} (producto con una orden Pendiente) | 409 PRD-004 |
 
 ### Users.API
 
