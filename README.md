@@ -65,6 +65,8 @@ dotnet run --project src/Notifications.API
 
 Cada `dotnet run` va en una consola distinta.
 
+Swagger se habilita solo en el entorno Development. En Visual Studio usar el perfil **http** (ya viene con `ASPNETCORE_ENVIRONMENT=Development`).
+
 > **Importante:** para borrar un producto (`DELETE /api/products/{id}`) Orders.API tiene que estar levantado, porque Products le pregunta si el producto tiene órdenes activas (PRD-004). Si Orders está apagado, el borrado responde 500 PRD-005 y el producto no se borra.
 
 ## Formato de los errores
@@ -84,7 +86,16 @@ Todos los errores (4xx y 5xx) responden con este formato (sección 3.1 de la con
 }
 ```
 
-Los errores los arman los `IExceptionHandler` de cada servicio. Nunca se muestra el detalle técnico (stack trace).
+Los errores los arman los `IExceptionHandler` de cada servicio.
+
+El nivel de detalle del error 500 depende del entorno (sección 5.2 de la consigna), con la opción `Errores:MostrarDetalle`:
+
+| Entorno | Archivo | MostrarDetalle | `detail` del 500 |
+|---|---|---|---|
+| Development | `appsettings.Development.json` | `true` | El mensaje real del error (ej.: no se pudo conectar a otro servicio) |
+| Production | `appsettings.json` | `false` | "Ocurrió un error inesperado." |
+
+El stack trace nunca se muestra en la respuesta: queda solo en el log.
 
 ## Códigos de error
 
@@ -219,8 +230,6 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 
 | Archivo | Endpoint | Resultado |
 |---|---|---|
-| [setup-user-register-201.png](docs/capturas/orders/setup-user-register-201.png) | POST /api/users/register (preparación) | 201 Creado |
-| [setup-product-create-201.png](docs/capturas/orders/setup-product-create-201.png) | POST /api/products (preparación) | 201 Creado |
 | [orders-201-crear.png](docs/capturas/orders/orders-201-crear.png) | POST /api/orders | 201 Creado |
 | [orders-200-obtener.png](docs/capturas/orders/orders-200-obtener.png) | GET /api/orders/{id} | 200 OK |
 | [orders-200-listar.png](docs/capturas/orders/orders-200-listar.png) | GET /api/orders?usuarioId={id} | 200 OK |
@@ -298,10 +307,10 @@ Products.API/
 
 ## Cómo trabajamos con Git
 
-Usamos GitHub Desktop y GitHub web.
+Usamos Visual Studio, GitHub Desktop y GitHub web.
 
-1. Traer lo último de `main` (Fetch origin y Pull origin).
-2. Crear una rama por tarea desde `main`: `feature/<servicio>-<tarea>` (por ejemplo `feature/products-serilog`).
+1. Traer lo último de `main` (Fetch/Pull, o Recuperar/Extraer en Visual Studio).
+2. Crear una rama por tarea desde `main`: `feature/...` para funcionalidad nueva, `fix/...` para correcciones y `docs/...` para documentación (por ejemplo `feature/products-serilog`).
 3. Hacer commits chicos con título "Servicio: qué se hizo" y una descripción simple.
 4. Subir la rama y abrir un Pull Request a `main`.
 5. Otro integrante lo prueba y lo aprueba. Recién ahí se mergea.
