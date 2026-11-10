@@ -192,6 +192,11 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 | [products-400-PRD-002.png](docs/products-400-PRD-002.png) | POST /api/products | 400 PRD-002 |
 | [products-409-PRD-003.png](docs/products-409-PRD-003.png) | POST /api/products | 409 PRD-003 |
 | [products-409-PRD-004.png](docs/products-409-PRD-004.png) | DELETE /api/products/{id} (producto con una orden Pendiente) | 409 PRD-004 |
+| [products-204-eliminar.png](docs/products-204-eliminar.png) | DELETE /api/products/{id} (la orden del producto ya está Enviada) | 204 |
+| [products-500-PRD-005.png](docs/products-500-PRD-005.png) | DELETE /api/products/{id} (Orders apagado; en Development se ve el detalle técnico) | 500 PRD-005 |
+| [products-health.png](docs/products-health.png) | /health | Healthy |
+| [products-health-ready.png](docs/products-health-ready.png) | /health/ready | Healthy |
+| [products-health-live.png](docs/products-health-live.png) | /health/live | Healthy |
 
 ### Users.API
 
@@ -205,6 +210,7 @@ Servicios con Health Checks implementados: **Products.API**, **Users.API**, **Or
 | [users-403-USR-004.png](docs/users-403-USR-004.png) | POST /api/users/login | 403 USR-004 |
 | [users-403-USR-005.png](docs/users-403-USR-005.png) | POST /api/users/login | 403 USR-005 |
 | [users-404-USR-007.png](docs/users-404-USR-007.png) | GET /api/users/{id} | 404 USR-007 |
+| [users-500-USR-006.png](docs/users-500-USR-006.png) | POST /api/users/register (ejemplo documentado en Swagger: Users no depende de otro servicio, así que el 500 solo aparece ante un error inesperado) | 500 USR-006 |
 | [users-health.png](docs/users-health.png) | /health | Healthy |
 | [users-health-ready.png](docs/users-health-ready.png) | /health/ready | Healthy |
 | [users-health-live.png](docs/users-health-live.png) | /health/live | Healthy |
