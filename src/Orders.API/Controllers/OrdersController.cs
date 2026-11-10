@@ -89,11 +89,11 @@ public class OrdersController : ControllerBase
     [ProducesResponseType(typeof(ErrorOrdenNoEncontrada), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorCambioEstadoNoPermitido), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ErrorInterno), StatusCodes.Status500InternalServerError)]
-    public ActionResult<UpdateOrderStatusResponse> ModificarEstado(Guid id, UpdateOrderStatusRequest request)
+    public IActionResult ModificarEstado(Guid id, UpdateOrderStatusRequest request)
     {
         ValidarDatos();
 
-        if (request == null || string.IsNullOrWhiteSpace(request.Estado))
+        if (request == null || request.Estado == null || request.Estado.Trim() == "")
         {
             throw new ValidationException(ErrorCodes.ORD_002, "Los datos de la orden son inválidos.");
         }

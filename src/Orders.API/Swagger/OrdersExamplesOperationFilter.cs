@@ -79,7 +79,7 @@ public class OrdersExamplesOperationFilter : IOperationFilter
 }");
             PonerEjemploRespuesta(operation, "400", EjemploError("400", "Bad Request", "Los datos de la orden son inválidos.", "ORD-002", "/api/orders/f1e2d3c4-0000-0000-0000-aabbccddeeff/status"));
             PonerEjemploRespuesta(operation, "404", EjemploError("404", "Not Found", "Orden no encontrada.", "ORD-001"));
-            PonerEjemploRespuesta(operation, "409", EjemploError("409", "Conflict", "Una orden en estado 'Entregada' no puede volver a 'Pendiente'.", "ORD-006", "/api/orders/f1e2d3c4-0000-0000-0000-aabbccddeeff/status"));
+            PonerEjemploRespuesta(operation, "409", EjemploError("409", "Conflict", "Una orden en estado 'Entregada' no puede pasar a 'Pendiente'.", "ORD-006", "/api/orders/f1e2d3c4-0000-0000-0000-aabbccddeeff/status"));
             PonerEjemploRespuesta(operation, "500", EjemploError("500", "Internal Server Error", "Error interno al procesar la orden.", "ORD-007"));
         }
     }
