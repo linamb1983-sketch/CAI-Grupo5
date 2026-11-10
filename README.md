@@ -36,6 +36,7 @@ Cada puerto está fijo en el `appsettings.json` de su servicio (sección `Kestre
    Orders.API        --->  Products.API   (valida el producto, toma el precio y controla el stock)
    Cart.API          --->  Products.API   (valida el producto y controla el stock)
    Notifications.API --->  Users.API      (valida que el usuario exista)
+   Products.API      --->  Orders.API     (antes de borrar un producto, revisa que no tenga órdenes activas)
 ```
 
 - Los servicios se comunican por HTTP con `IHttpClientFactory` y se pasan el header `X-Correlation-Id`.
