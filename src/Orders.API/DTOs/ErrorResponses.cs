@@ -125,7 +125,7 @@ public class ErrorStockInsuficiente
     /// <example>https://tools.ietf.org/html/rfc4918#section-11.2</example>
     public string Type { get; set; } = string.Empty;
     /// <summary>Título del error.</summary>
-    /// <example>UnprocessableEntity</example>
+    /// <example>Unprocessable Entity</example>
     public string Title { get; set; } = string.Empty;
     /// <summary>Estado HTTP.</summary>
     /// <example>422</example>

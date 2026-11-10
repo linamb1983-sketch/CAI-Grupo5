@@ -57,7 +57,7 @@ public class OrdersExamplesOperationFilter : IOperationFilter
             PonerEjemplos404Crear(operation);
             PonerEjemploRespuesta(operation, "422", @"{
   ""type"": ""https://tools.ietf.org/html/rfc4918#section-11.2"",
-  ""title"": ""UnprocessableEntity"",
+  ""title"": ""Unprocessable Entity"",
   ""status"": 422,
   ""detail"": ""No se puede procesar la solicitud."",
   ""instance"": ""/api/orders"",

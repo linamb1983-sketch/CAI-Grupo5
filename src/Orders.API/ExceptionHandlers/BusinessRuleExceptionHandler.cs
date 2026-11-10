@@ -29,7 +29,7 @@ public class BusinessRuleExceptionHandler : IExceptionHandler
         if (ex.ErrorCode == ErrorCodes.ORD_005)
         {
             status = 422;
-            title = "UnprocessableEntity";
+            title = "Unprocessable Entity";
             type = "https://tools.ietf.org/html/rfc4918#section-11.2";
             detail = "No se puede procesar la solicitud.";
         }
