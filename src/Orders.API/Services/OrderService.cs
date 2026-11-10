@@ -54,14 +54,14 @@ public class OrderService
     }
 
     // Valida referencias y stock antes de guardar la orden.
-    public async Task<OrderResponse> Crear(CreateOrderRequest request, CancellationToken cancellationToken)
+    public async Task<OrderResponse> Crear(CreateOrderRequest request)
     {
         if (request.UsuarioId == Guid.Empty || request.Items == null || request.Items.Count == 0)
         {
             throw new ValidationException(ErrorCodes.ORD_002, "Los datos de la orden son inválidos.");
         }
 
-        await ValidarUsuario(request.UsuarioId, cancellationToken);
+        await ValidarUsuario(request.UsuarioId);
 
         List<ProductLookupResponse> productos = new List<ProductLookupResponse>();
         List<OrderItem> items = new List<OrderItem>();
@@ -78,7 +78,7 @@ public class OrderService
 
             if (producto == null)
             {
-                producto = await ObtenerProducto(itemRequest.ProductoId, cancellationToken);
+                producto = await ObtenerProducto(itemRequest.ProductoId);
                 productos.Add(producto);
             }
 
@@ -153,19 +153,13 @@ public class OrderService
     }
 
     // Consulta Users API y traduce un 404 al código de Orders.
-    private async Task ValidarUsuario(Guid usuarioId, CancellationToken cancellationToken)
+    private async Task ValidarUsuario(Guid usuarioId)
     {
-        string? direccion = configuracion["Services:Users:BaseUrl"];
-
-        if (string.IsNullOrWhiteSpace(direccion))
-        {
-            throw new InvalidOperationException("La configuración 'Services:Users:BaseUrl' no contiene una URL válida.");
-        }
-
-        string url = $"{direccion.TrimEnd('/')}/api/users/{usuarioId}";
+        string direccion = configuracion["Services:Users:BaseUrl"]!;
+        string url = $"{direccion}/api/users/{usuarioId}";
         HttpClient cliente = CrearClienteConCorrelationId();
 
-        using HttpResponseMessage respuesta = await cliente.GetAsync(url, cancellationToken);
+        HttpResponseMessage respuesta = await cliente.GetAsync(url);
 
         if (respuesta.StatusCode == HttpStatusCode.NotFound)
         {
@@ -174,24 +168,18 @@ public class OrderService
 
         if (respuesta.IsSuccessStatusCode == false)
         {
-            throw new InvalidOperationException($"Users API respondió con HTTP {(int)respuesta.StatusCode}.");
+            throw new Exception($"Users API respondió con HTTP {(int)respuesta.StatusCode}.");
         }
     }
 
     // Consulta Products API y obtiene precio y stock del producto.
-    private async Task<ProductLookupResponse> ObtenerProducto(Guid productoId, CancellationToken cancellationToken)
+    private async Task<ProductLookupResponse> ObtenerProducto(Guid productoId)
     {
-        string? direccion = configuracion["Services:Products:BaseUrl"];
-
-        if (string.IsNullOrWhiteSpace(direccion))
-        {
-            throw new InvalidOperationException("La configuración 'Services:Products:BaseUrl' no contiene una URL válida.");
-        }
-
-        string url = $"{direccion.TrimEnd('/')}/api/products/{productoId}";
+        string direccion = configuracion["Services:Products:BaseUrl"]!;
+        string url = $"{direccion}/api/products/{productoId}";
         HttpClient cliente = CrearClienteConCorrelationId();
 
-        using HttpResponseMessage respuesta = await cliente.GetAsync(url, cancellationToken);
+        HttpResponseMessage respuesta = await cliente.GetAsync(url);
 
         if (respuesta.StatusCode == HttpStatusCode.NotFound)
         {
@@ -200,14 +188,14 @@ public class OrderService
 
         if (respuesta.IsSuccessStatusCode == false)
         {
-            throw new InvalidOperationException($"Products API respondió con HTTP {(int)respuesta.StatusCode}.");
+            throw new Exception($"Products API respondió con HTTP {(int)respuesta.StatusCode}.");
         }
 
-        ProductLookupResponse? producto = await respuesta.Content.ReadFromJsonAsync<ProductLookupResponse>(cancellationToken);
+        ProductLookupResponse? producto = await respuesta.Content.ReadFromJsonAsync<ProductLookupResponse>();
 
         if (producto == null)
         {
-            throw new InvalidOperationException("Products API devolvió una respuesta vacía.");
+            throw new Exception("Products API devolvió una respuesta vacía.");
         }
 
         return producto;
